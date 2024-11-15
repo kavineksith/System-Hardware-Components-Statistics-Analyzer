@@ -39,6 +39,7 @@ This Python script provides comprehensive system monitoring capabilities, offeri
 - `platform` library for accessing system platform information
 - `datetime` library for date-time operations
 - `socket` library for network-related operations
+- `netifaces` library for network interface information and IP address retrieval
 - `report_signatures` module for generating reports with date-time stamps
 
 ## Usage

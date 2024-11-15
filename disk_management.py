@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 import sys
 import psutil
@@ -20,11 +22,18 @@ class DiskManager:
                     "MountPoint": partition.mountpoint,
                     "FileSystemType": partition.fstype,
                     "Opts": partition.opts,
-                    "MaxFile": partition.maxfile,
-                    "MaxPath": partition.maxpath
                 }
+                
+                # Try to get maxfile and maxpath if available
+                try:
+                    partition_dict["MaxFile"] = partition.maxfile
+                    partition_dict["MaxPath"] = partition.maxpath
+                except AttributeError:
+                    pass  # Ignore the error if the attribute is not available
+
                 self.partitions.append(partition.device)  # Store device name only
                 partition_info.append(partition_dict)
+
             return partition_info
         except Exception as e:
             print(f"Error generating overall report: {e}")
@@ -92,7 +101,7 @@ class DiskManager:
                     'Storage Overall Report': overall_report,
                     'Storage Statistics Report': storage_report,
                     'Storage Level Report': storage_level,
-                    'Generated Time & Date': TimeStampGenerator().generate_report()
+                    'Generated Time & Date': f'{TimeStampGenerator().generate_report()}'
                 }
             }
 

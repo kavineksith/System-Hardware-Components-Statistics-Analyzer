@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import datetime  # importing datetime, os, json, platform, sys and psutil libraries
 import os
 import json

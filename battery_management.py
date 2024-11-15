@@ -29,6 +29,3 @@ class BatteryManager:
         except Exception as e:
             print(f"Error: {e}")
             sys.exit(1)
-
-test = BatteryManager().batteryManagement()
-print(test)

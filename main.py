@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from battery_management import BatteryManager
 from cpu_management import CPUManager
 from disk_management import DiskManager

@@ -1,4 +1,6 @@
-# import json
+#!/usr/bin/env python3
+
+import json
 import psutil
 import sys
 from report_signatures import TimeStampGenerator
@@ -51,25 +53,9 @@ class ProcessManager:
                 }
             }
 
-            return statistics
-
-            # json_output = json.dumps(statistics, indent=4)
-            # print(json_output)  # Return the JSON output as a string
+            result = json.dumps(statistics, indent=4)
+            json_output = json.loads(result)
+            return json_output  # Return the JSON output as a string
         except Exception as e:
             print(f"Error: {e}")
             sys.exit(1)
-
-
-# def save_to_json():
-#     try:
-#         process_manager = ProcessManager()
-#         # process_manager.manage_processes()
-#         statistics = process_manager.manage_processes()
-#
-#         with open("./disk_statistics.json", 'w', encoding='utf-8') as json_file:
-#             json.dump(statistics, json_file, indent=4, ensure_ascii=False)
-#     except Exception as e:
-#         print(f"Error saving JSON data: {e}")
-#
-#
-# save_to_json()

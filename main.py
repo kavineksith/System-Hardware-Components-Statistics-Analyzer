@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys
+import logging
 from battery_management import BatteryManager
 from cpu_management import CPUManager
 from disk_management import DiskManager
@@ -9,13 +11,20 @@ from process_management import ProcessManager
 from system_infoAnalyzer import SystemInformation
 from terminal_clearance import ScreenManager
 from methods import control_result_to_json
-import sys
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG,  # Log all levels (DEBUG and above)
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[logging.StreamHandler()])
+
+# Create a logger
+logger = logging.getLogger(__name__)
 
 class systemAnalyzer:
     @staticmethod
     def all_in_one():
         try:
+            logger.info("Generating all-in-one report...")
             cpu_status = CPUManager().monitor_cpu()
             process_status = ProcessManager().manage_processes()
             memory_status = MemoryManager().memory_statistics()
@@ -26,16 +35,17 @@ class systemAnalyzer:
 
             status_list = [cpu_status, process_status, memory_status, disk_status, network_status, system_status,
                            battery_status]
-
+            logger.info("All-in-one report generated successfully.")
             return status_list
 
         except Exception as e:
-            print(f"Error in generating all-in-one report: {e}")
+            logger.error(f"Error generating all-in-one report: {e}")
             return None  # Return None or handle the error as appropriate in this application
 
     @staticmethod
     def once_status_one_report(token):
         try:
+            logger.info(f"Generating report for token: {token}")
             match token:
                 case 0:
                     ScreenManager().clear_screen()
@@ -55,24 +65,29 @@ class systemAnalyzer:
                 case 7:
                     return BatteryManager().batteryManagement()
                 case _:
+                    logger.warning('Invalid selection. Please enter a number between 0 and 7.')
                     print('Invalid selection. Please enter a number between 0 and 7.')
                     systemAnalyzer().reportWizarder()  # Recursively call the method to prompt again
         except Exception as e:
+            logger.error(f"Error executing report: {e}")
             return f'Error executing report: {e}'
 
     @staticmethod
     def reportWizarder():
         try:
             favor = input('What kind of report do you need today? ').lower()
+            logger.info(f"User selected: {favor}")
             if favor.replace(' ', '_') == 'single_report':
                 while True:
                     try:
                         report_id = int(input('Enter Report ID (1-7, 0 to clear screen): '))
                         if report_id < 0 or report_id > 7:
+                            logger.warning('Invalid report ID entered.')
                             print('Please enter a number between 1 and 7, or 0 to clear the screen.')
                         else:
                             break  # Exit the loop if a valid report ID is entered
                     except ValueError:
+                        logger.warning('Non-numeric input detected for report ID.')
                         print('Invalid input. Please enter a valid number.')
 
                 if report_id == 0:
@@ -82,33 +97,39 @@ class systemAnalyzer:
                 else:
                     statistics = systemAnalyzer().once_status_one_report(report_id)
                     if statistics is None:
+                        logger.error(f"Failed to generate report with Report ID {report_id}.")
                         print(f"Failed to generate report with Report ID {report_id}.")
                     else:
                         control_result_to_json(statistics)
-                        print(f"Single report with Report ID {report_id} has been successfully generated and saved.")
+                        logger.info(f"Single report with Report ID {report_id} generated and saved.")
 
             elif favor.replace(' ', '_') == 'all_in_one':
                 statistics = systemAnalyzer.all_in_one()
                 control_result_to_json(statistics)
-                print("All-in-one report has been successfully generated and saved.")
+                logger.info("All-in-one report generated and saved.")
 
             else:
+                logger.warning('Invalid choice for report type.')
                 print('Invalid choice. Please choose "single_report" or "all_in_one".')
                 systemAnalyzer().reportWizarder()  # Recursively call the method to prompt again
 
         except KeyboardInterrupt:
+            logger.error("Process interrupted by the user.")
             print("\nProcess interrupted by the user. Exiting...")
             sys.exit(1)  # Exit with error status
 
         except ValueError as ve:
+            logger.error(f"ValueError: {ve}")
             print(f"ValueError: {ve}")
             sys.exit(1)  # Exit with error status
 
         except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             print(f"Error: {e}")
             sys.exit(1)  # Exit with error status
 
 
 if __name__ == "__main__":
+    logger.info("Starting system analyzer.")
     systemAnalyzer().reportWizarder()
     sys.exit(0)
